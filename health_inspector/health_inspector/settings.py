@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'account'
@@ -144,6 +145,10 @@ EMAIL_HOST_USER = secrets.EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = secrets.EMAIL_HOST_PASSWORD
 EMAIL_PORT = secrets.EMAIL_PORT
 EMAIL_USE_TLS = True
+
+TWILIO_PHONE_NUMBER = secrets.TWILIO_PHONE_NUMBER
+TWILIO_ACCOUNT_SID = secrets.TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN = secrets.TWILIO_AUTH_TOKEN
 
 OPTIONS = {
 'init_command': ("SET time_zone='%s'" % TIME_ZONE),

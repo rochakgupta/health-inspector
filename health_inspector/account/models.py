@@ -22,6 +22,7 @@ class CustomUser(AbstractUser):
     gender = models.CharField(max_length=2, choices=GENDER_CHOICES, default=GENDER_CHOICES[2][0])
     
     USERNAME_FIELD = 'phone'
+    REQUIRED_FIELDS = ['username', 'email']
     
     def __str__(self):
         return self.first_name + ' ' + self.last_name
@@ -53,6 +54,16 @@ class Child(models.Model):
     class Meta:
         verbose_name = 'Child'
         verbose_name_plural = 'Children'
+
+#class Disease(models.Model):
+#    name = models.CharField(null=False, blank=False, max_length=128)
+#    
+#    class Meta:
+#        unique_together = ('name',)
+#        verbose_name = 'Disease'
+#        
+#class Event(models.Model):
+#    name = 
 
 
 #from django.db import models

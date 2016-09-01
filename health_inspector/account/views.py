@@ -13,6 +13,9 @@ from django.db.models import Q
 from django.db.models import Count
 from .models import CustomUser, Doctor, Parent, Child
 from .forms import LoginForm, BaseSignupForm, DoctorSignupForm, ParentSignupForm, ChildSignupForm
+import twilio
+import twilio.rest
+from pprint import pprint
 
 @require_GET
 @login_required
@@ -58,7 +61,7 @@ def signup_doctor(request):
             doctor.doctor = custom_user
             doctor.save()
             return redirect(reverse('home'))
-     
+        
 @login_required
 def signup_parent(request):
     if not request.user.is_doctor:
@@ -100,6 +103,13 @@ def signup_child(request):
             return redirect(reverse('home'))
         
 def logout(request):
+#    client = twilio.rest.TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+#    obj = client.messages.create(
+#        body='You are now logging out',
+#        to='+91' + request.user.phone,
+#        from_=settings.TWILIO_PHONE_NUMBER
+#    )
+#    pprint(obj.__dict__)
     auth_logout(request)
     return redirect(reverse('login'))
 
