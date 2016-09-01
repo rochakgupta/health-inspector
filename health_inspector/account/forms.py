@@ -78,6 +78,7 @@ class ParentSignupForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ParentSignupForm, self).__init__(*args, **kwargs)
+        self.fields['aadhar'].label = 'Aadhar Number'
 
     def clean_aadhar(self):
         data_aadhar = self.cleaned_data.get('aadhar', '')
