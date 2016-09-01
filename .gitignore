@@ -83,3 +83,6 @@ sftp-config.json
 
 #media files
 media/
+
+#secrets
+health_inspector/health_inspector/secrets.py

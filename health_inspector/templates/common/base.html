@@ -1,0 +1,33 @@
+{% load staticfiles %}
+<html>
+    <head>
+        <title> {% block title %} {% endblock %}| Health Inspector </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{% static 'common/css/font-awesome.min.css' %}" rel="stylesheet">
+        {% include 'material/includes/material_css.html' %}
+        <link href="{% static 'common/css/base.css' %}" rel="stylesheet">
+        {% block extrahead %} {% endblock %}
+    </head>
+    <body class="teal">
+        <header>
+            <nav class="top-nav white">
+                <div class="nav-wrapper">
+                    <a href="{% url 'home' %}" class="brand-logo teal-text center">Health Inspector</a>
+                    {% block header-content %} 
+                        {% if request.user.is_authenticated %}
+                            
+                        {% endif %}
+                    {% endblock %}
+                </div>
+            </nav>
+        </header>
+        <main class="container">
+            {% block content %} {% endblock %}
+        </main>
+        {% block other %}
+        {% endblock %}
+        <script src="{% static 'common/js/jquery-2.2.1.min.js' %}"></script>
+        {% include 'material/includes/material_js.html' %}
+        {% block scripts %} {% endblock %}
+    </body>
+</html>

@@ -1,0 +1,11 @@
+SECRET_KEY = '5ecret'
+DATABASE_NAME = 'health_inspector'
+DATABASE_HOST = 'localhost'
+DATABASE_USER = 'root'
+DATABASE_PASSWORD = 'r00t'
+DATABASE_PORT = 3306
+TIME_ZONE = 'Asia/Kolkata'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'example@gmail.com'
+EMAIL_HOST_PASSWORD = '9m411'
+EMAIL_PORT = 587

@@ -1,0 +1,29 @@
+{% extends 'common/base.html' %}
+{% block title %} Login {% endblock %}
+{% load material_form %}
+
+{% block content %}
+<div class="row">
+    <div class="col s12 m10 l8 offset-m1 offset-l2">
+        <div class="card-panel" style="margin-top:20px; padding-top: 12px; padding-bottom: 5px;">
+            <div class="row valign-wrapper">
+                <div class="col s4 left-align"><h5>Login</h5></div>
+                <div class="col s8 right-align"><a class="btn waves-effect waves-light" href="{% url 'signup-doctor' %}">Sign Up as Doctor</a></div>
+            </div>
+            <form action = "{% url 'login' %}" method='POST'>    
+                {% csrf_token %}
+                {% form form=f %}{% endform %}
+                <div class="row center valign-wrapper">
+                    <div class="col s12 center">
+                        <button type="submit" id ="login_btn" name="login" class="btn waves-effect waves-light">Log In</button>
+                    </div>
+                </div>
+            </form> 
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+    
+  
+        
