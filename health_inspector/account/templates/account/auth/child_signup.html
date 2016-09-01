@@ -1,5 +1,5 @@
 {% extends 'common/base.html' %}
-{% block title %} Sign Up - Doctor {% endblock %}
+{% block title %} Sign Up - Child {% endblock %}
 {% load material_form %}
 
 {% block content %}
@@ -7,15 +7,14 @@
     <div class="col s12 m10 l8 offset-m1 offset-l2">
         <div class="card-panel" style="margin-top:20px; padding-top: 12px; padding-bottom: 5px;">
             <div class="row valign-wrapper">
-                <div class="col s12 left-align"><h5> Sign Up - Doctor </h5></div>
+                <div class="col s12 left-align"><h5> Sign Up - Child </h5></div>
             </div>
-            <form action = "{% url 'signup-doctor' %}" method='POST'>
+            <form action = "{% url 'signup-child' %}" method='POST'>
                 {% csrf_token %}
-                {% form form=b %}{% endform %}
-                {% form form=d %}{% endform %}
+                {% form form=f %}{% endform %}
                 <div class="row center">
                     <div class="col s12">
-                        <button type="submit" id ="signup_doctor_btn" name="signup_doctor" class="btn waves-effect waves-light">Sign Up</button>
+                        <button type="submit" id ="signup_child_btn" name="signup_child" class="btn waves-effect waves-light">Sign Up</button>
                     </div>
                 </div>
             </form>

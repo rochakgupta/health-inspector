@@ -50,12 +50,53 @@ def signup_doctor(request):
             return render(request, 'account/auth/doctor_signup.html', {'b': b, 'd': d})
         else:
             custom_user = b.save(commit=False)
+            custom_user.username = b.cleaned_data['phone']
             custom_user.set_password(b.cleaned_data['password'])
             custom_user.is_doctor = True
             custom_user.save()
             doctor = d.save(commit=False)
             doctor.doctor = custom_user
             doctor.save()
+            return redirect(reverse('home'))
+     
+@login_required
+def signup_parent(request):
+    if not request.user.is_doctor:
+        return redirect(reverse('home'))
+    if request.method == 'GET':
+        context = {'b': BaseSignupForm(prefix='b'), 'p': ParentSignupForm(prefix='p')}
+        return render(request, 'account/auth/parent_signup.html', context)
+    else:
+        b = BaseSignupForm(request.POST, prefix='b')
+        p = ParentSignupForm(request.POST, prefix='p')
+        if not b.is_valid() or not p.is_valid():
+            return render(request, 'account/auth/parent_signup.html', {'b': b, 'p': p})
+        else:
+            custom_user = b.save(commit=False)
+            custom_user.username = b.cleaned_data['phone']
+            custom_user.set_password(b.cleaned_data['password'])
+            custom_user.is_doctor = False
+            custom_user.save()
+            parent = p.save(commit=False)
+            parent.parent = custom_user
+            parent.save()
+            return redirect(reverse('home'))
+        
+@login_required
+def signup_child(request):
+    if not request.user.is_doctor:
+        return redirect(reverse('home'))
+    if request.method == 'GET':
+        context = {'f': ChildSignupForm()}
+        return render(request, 'account/auth/child_signup.html', context)
+    else:
+        f = ChildSignupForm(request.POST)
+        if not f.is_valid():
+            return render(request, 'account/auth/child_signup.html', {'f': f})
+        else:
+            child = f.save(commit=False)
+            child.parent = f.valid_parent
+            child.save()
             return redirect(reverse('home'))
         
 def logout(request):

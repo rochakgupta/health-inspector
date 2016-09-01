@@ -48,7 +48,7 @@ class Child(models.Model):
     first_name = models.CharField(max_length=30, null=True, blank=True)
     last_name = models.CharField(max_length=30, null=True, blank=True)
     gender = models.CharField(max_length=2, choices=GENDER_CHOICES, default=GENDER_CHOICES[2][0])
-    parent = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="children")
+    parent = models.ForeignKey(Parent, on_delete=models.CASCADE, related_name="children")
 
     class Meta:
         verbose_name = 'Child'

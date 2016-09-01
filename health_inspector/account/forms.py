@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from material import *
 from .models import CustomUser, Doctor, Parent, Child
-from datetime import datetime
+from datetime import date, datetime
 
 def phone_validator(val):
     if not re.match('^[789]\d{9}$', val):
@@ -62,7 +62,7 @@ class BaseSignupForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ['phone', 'first_name', 'last_name']
+        fields = ['phone', 'first_name', 'last_name', 'gender']
         
 class DoctorSignupForm(forms.ModelForm):
 
@@ -93,6 +93,7 @@ class ChildSignupForm(forms.ModelForm):
     parent_phone = forms.CharField(label="Parent's Phone Number", max_length = 10, validators=[phone_validator])
     
     def __init__(self, *args, **kwargs):
+        self.valid_parent = None
         super(ChildSignupForm, self).__init__(*args, **kwargs)
         self.fields['dob'].input_formats=['%d/%m/%Y']
         self.fields['dob'].label='Date of Birth'
@@ -100,14 +101,22 @@ class ChildSignupForm(forms.ModelForm):
         
     def clean_dob(self):
         data_dob = self.cleaned_data.get('dob', '')
-        if data_dob and (not data_dob <= datetime.now()):
-            raise forms.ValidationError('Date must be ')
+        if data_dob and (not data_dob <= date.today()):
+            raise forms.ValidationError('Date of birth cannot be in the future')
         return data_dob
         
     def clean_parent_phone(self):
         data_parent_phone = self.cleaned_data.get('parent_phone', '')
-        if data_parent_phone and not CustomUser.objects.filter(phone = data_parent_phone).exists():
-            raise forms.ValidationError('Unregistered Number')
+        if data_parent_phone:
+            custom_user = CustomUser.objects.filter(phone = data_parent_phone)
+            if not custom_user.exists():
+                raise forms.ValidationError('Unregistered Number')
+            else:
+                parents = Parent.objects.filter(parent_id=custom_user[0].id)
+                if not parents.exists():
+                    raise forms.ValidationError('User is registered only as a doctor. Must register as parent too.')
+                else:
+                    self.valid_parent = parents[0]
         return data_parent_phone
 
     class Meta:
