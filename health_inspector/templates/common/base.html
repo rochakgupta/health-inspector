@@ -6,21 +6,8 @@
         <link href="{% static 'common/css/font-awesome.min.css' %}" rel="stylesheet">
         {% include 'material/includes/material_css.html' %}
         <link href="{% static 'common/css/base.css' %}" rel="stylesheet">
-        {% if request.user.is_authenticated %}
-        <style>
-            @media only screen and (min-width : 992px) {
-                header, main{
-                    padding-left: 200px;
-                }
-            }
-            @media only screen and (max-width : 992px) {
-                header, main{
-                    padding-left: 0;
-                }
-            }
-        </style>
-        {% endif %}
-        {% block extrahead %} {% endblock %}
+        {% block extrahead %}
+        {% endblock %}
     </head>
     <body class="teal">
         <header>
@@ -28,21 +15,16 @@
                 <div class="nav-wrapper">
                     <a href="{% url 'home' %}" class="brand-logo teal-text center">Health Inspector</a>
                     {% if request.user.is_authenticated %}
-                        <div class="container" style="margin-left: 20px;">
-                            <a href="#" data-activates="slide-out" class="button-collapse top-nav full hide-on-large-only teal-text"><i class="mdi-navigation-menu"></i></a>
-                        </div>
+                        <ul id="nav-mobile" class="left">
+                            <li><a href="#" data-activates="slide-out" class="button-collapse top-nav full hide-on-large-only teal-text"><i class="mdi-navigation-menu"></i></a></li>
+                        </ul>
+                        <ul id="nav-mobile" class="right">
+                            <li><a href="{% url 'logout' %}" class="teal-text">Logout</a></li>
+                        </ul>
                     {% endif %}
                 </div>
             </nav>
-            {% if request.user.is_authenticated %}
-            <ul id="slide-out" class="side-nav fixed" style="width: 200px;">
-                <li><a href="{% url 'home' %}" class="teal-text">My Profile</a></li>
-                {% if request.user.is_doctor %}
-                <li><a href="{% url 'signup-parent' %}" class="teal-text">Add Parent</a></li>
-                <li><a href="{% url 'signup-child' %}" class="teal-text">Add Child</a></li>
-                {% endif %}
-            </ul>
-            {% endif %}
+            {% block header-content %} {% endblock %}
         </header>
         <main class="container">
             {% block content %} {% endblock %}

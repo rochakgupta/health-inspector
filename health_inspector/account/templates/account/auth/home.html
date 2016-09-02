@@ -2,19 +2,66 @@
 {% block title %} Home {% endblock %}
 {% load material_form %}
 
+{% block extrahead %}
+<style>
+    main{
+        padding-right: 10px;
+    }
+    @media only screen and (min-width : 993px) {
+        header{
+            padding-left: 200px;
+        }
+        main{
+            padding-left: 210px;
+        }
+    }
+    @media only screen and (max-width : 992px) {
+        header{
+            padding-left: 0px;
+        }
+        main{
+            padding-left: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block header-content %}
+<ul id="slide-out" class="side-nav fixed" style="width: 200px;">
+    <li style="background-color: #009688;" class="center"><a class="white-text" style="cursor: default;"><b>{{ request.user.first_name }} {% if request.user.last_name %} {{ request.user.last_name }} {% endif %}</b></a></li>
+    <li><a href="{% url 'home' %}" class="teal-text">Home</a></li>
+    {% if request.user.is_doctor %}
+    <li><a href="{% url 'signup-parent' %}" class="teal-text">Add Parent</a></li>
+    <li><a href="{% url 'signup-child' %}" class="teal-text">Add Child</a></li>
+    {% endif %}
+</ul>
+{% endblock %}
+
 {% block content %}
-<div class="row">
-    <div class="col s12 m10 l8 offset-m1 offset-l2">
+<div class="row center">
+    <div class="col s12 m6">
         <div class="card-panel" style="margin-top:20px; padding-top: 12px; padding-bottom: 0px; border: 1px solid white;">
-            <div class="row valign-wrapper">
-                <div class="col s6 left-align"><h5>Home</h5></div>
-                <div class="col s6 right-align"><a class="btn waves-effect waves-light" href="{% url 'logout' %}">Logout</a></div>
+            <div class="row valign-wrapper center">
+                <div class="col s12"><h5>Home</h5></div>
+            </div>
+        </div>
+    </div>
+    <div class="col s12 m6">
+        <div class="card-panel" style="margin-top:20px; padding-top: 12px; padding-bottom: 0px; border: 1px solid white;">
+            <div class="row valign-wrapper center">
+                <div class="col s12"><h5>Home</h5></div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
-    
+{% block scripts %}
+<script>
+$(document).ready(function () {
+    $('main').removeClass('container');
+});
+</script>
+{% endblock %}
   
         

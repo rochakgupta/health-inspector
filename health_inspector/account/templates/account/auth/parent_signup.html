@@ -1,6 +1,21 @@
-{% extends 'common/base.html' %}
+{% extends 'account/auth/home.html' %}
 {% block title %} Sign Up - Parent {% endblock %}
 {% load material_form %}
+
+{% block extrahead %}
+<style>
+    @media only screen and (min-width : 993px) {
+        header, main{
+            padding-left: 200px;
+        }
+    }
+    @media only screen and (max-width : 992px) {
+        header, main{
+            padding-left: 0px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -22,4 +37,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script></script>
 {% endblock %}
