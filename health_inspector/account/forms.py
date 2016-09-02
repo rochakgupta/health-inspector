@@ -50,7 +50,7 @@ class BaseSignupForm(forms.ModelForm):
     def clean_phone(self):
         data_phone = self.cleaned_data.get('phone', '')
         if data_phone and CustomUser.objects.filter(phone = data_phone).exists():
-            raise forms.ValidationError('User with this phone number already exists')
+            raise forms.ValidationError('This phone number is already registered with')
         return data_phone
 
     def clean_confirm_password(self):
@@ -115,7 +115,7 @@ class ChildSignupForm(forms.ModelForm):
             else:
                 parents = Parent.objects.filter(parent_id=custom_user[0].id)
                 if not parents.exists():
-                    raise forms.ValidationError('User is registered only as a doctor. Must register as parent too.')
+                    raise forms.ValidationError('This user is registered only as a doctor. Must register as parent too.')
                 else:
                     self.valid_parent = parents[0]
         return data_parent_phone
