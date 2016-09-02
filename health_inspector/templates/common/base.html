@@ -36,12 +36,10 @@
             </nav>
             {% if request.user.is_authenticated %}
             <ul id="slide-out" class="side-nav fixed" style="width: 200px;">
-                {% if request.user.is_doctor %}
                 <li><a href="{% url 'home' %}" class="teal-text">My Profile</a></li>
+                {% if request.user.is_doctor %}
                 <li><a href="{% url 'signup-parent' %}" class="teal-text">Add Parent</a></li>
                 <li><a href="{% url 'signup-child' %}" class="teal-text">Add Child</a></li>
-                {% else %}
-                <li><a href="#" class="teal-text">My Profile</a></li>
                 {% endif %}
             </ul>
             {% endif %}

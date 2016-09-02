@@ -19,6 +19,7 @@ def aadhar_validator(val):
 class CustomUser(AbstractUser):
     phone = models.CharField(unique=True, max_length=10,validators=[phone_validator])
     is_doctor = models.BooleanField(default=False)
+    is_parent = models.BooleanField(default=False)
     gender = models.CharField(max_length=2, choices=GENDER_CHOICES, default=GENDER_CHOICES[2][0])
     
     USERNAME_FIELD = 'phone'

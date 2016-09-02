@@ -20,7 +20,10 @@ from pprint import pprint
 @require_GET
 @login_required
 def home(request):
-    return render(request, 'account/auth/home.html')
+    if request.user.is_superuser:
+        return redirect(reverse('admin:index'))
+    else:
+        return render(request, 'account/auth/home.html')
 
 @require_http_methods(['GET', 'POST'])
 def login(request):
@@ -56,6 +59,7 @@ def signup_doctor(request):
             custom_user.username = b.cleaned_data['phone']
             custom_user.set_password(b.cleaned_data['password'])
             custom_user.is_doctor = True
+            custom_user.is_parent = False
             custom_user.save()
             doctor = d.save(commit=False)
             doctor.doctor = custom_user
@@ -79,6 +83,7 @@ def signup_parent(request):
             custom_user.username = b.cleaned_data['phone']
             custom_user.set_password(b.cleaned_data['password'])
             custom_user.is_doctor = False
+            custom_user.is_parent=True
             custom_user.save()
             parent = p.save(commit=False)
             parent.parent = custom_user

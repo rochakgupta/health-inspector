@@ -20,6 +20,7 @@ from django.conf import settings
 from account import views as account_views
 
 urlpatterns = [
+    url(r'^admin/logout/$', account_views.logout),
     url(r'^admin/', admin.site.urls),
     url(r'^', include('account.urls')),
 #    url(r'', include(frontend_urls)),
