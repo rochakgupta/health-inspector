@@ -187,6 +187,33 @@ def edit_profile(request):
             custom_user.save()
             context = {}
             return redirect(reverse('edit-profile'))
+        
+@require_GET
+def search_child(request):
+    query_term = request.GET.get('c')
+    data = {'children': []}
+    if not query_term:
+        return JsonResponse(data)
+    custom_users = CustomUser.objects.filter(Q(phone__startswith=query_term) & Q(is_parent=True))
+    children = []
+    gender = {
+        'M' : 'Male',
+        'F' : 'Female',
+        'NS' : 'Not Specified'
+    }
+    for custom_user in custom_users:
+        parent_children = Child.objects.filter(parent_id=custom_user.id)
+        children = children + [{
+                'name': parent_child.first_name + ' ' + parent_child.last_name,
+                'gender': gender[parent_child.gender],
+                'dob': parent_child.dob,
+                'parent_name': custom_user.first_name + ' ' + custom_user.last_name,
+                'parent_phone': custom_user.phone,
+                'parent_aadhar': Parent.objects.get(parent=custom_user).aadhar
+            } for parent_child in parent_children
+        ]
+    data['children'] = children
+    return JsonResponse(data)
 
 #from django.shortcuts import render, get_object_or_404, redirect
 #from django.http import Http404, JsonResponse, HttpResponse

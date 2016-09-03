@@ -4,6 +4,28 @@
 
 {% block extrahead %}
 <style>
+    table{
+        border: 1px solid rgb(208,208,208);
+    }
+
+    th, td{
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    td:not(:last-child),
+    th:not(:last-child){
+        border-right: 1px solid rgb(208,208,208);
+    }
+
+    tr:not(:last-child){
+        border-bottom: 1px solid rgb(208,208,208);
+    }
+    .table-container{
+        width: 100%;
+        overflow-y: auto;
+        margin: 0;
+    }
     main{
         padding-right: 10px;
     }
@@ -58,6 +80,7 @@
 {% endblock %}
 
 {% block content %}
+<!--
 <div class="row center">
     <div class="col s12 m6">
         <div class="card-panel" style="margin-top:20px; padding-top: 12px; padding-bottom: 0px; border: 1px solid white;">
@@ -74,12 +97,95 @@
         </div>
     </div>
 </div>
+-->
+<div class="row">
+    <div class="col s12">
+        <div class="card-panel" style="margin-top:20px;">
+            <div class="card-content">
+                <div class="row center" style="margin-top:5px; margin-bottom: 0px;" id="search-div">
+                    <input class="left col s12 m4 offset-m4" type="text" id="search" placeholder="Search Child By Parent's Phone Number" autocomplete="off">
+                </div>
+                
+            </div>
+        </div>
+        <div class="card-panel" style="margin-top:20px;">
+            <div class="card-content">
+                <div class="row" style="margin-top:5px; margin-bottom: 0px;">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-field="name">Name</th>
+                                    <th data-field="gender">Gender</th>
+                                    <th data-field="dob">Date of Birth</th>
+                                    <th data-field="parent_name">Parent's Name</th>
+                                    <th data-field="parent_phone">Parent's Phone Number</th>
+                                    <th data-field="parent_aadhar">Parent's Aadhar Number</th>
+                                </tr>
+                            </thead>
+                            <tbody id="results">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+ChildSearch = (function () {
+    function updateResults(children){
+        var results_table = document.getElementById('results');
+        results_table.innerHTML = "";
+        for(var i=0;i<children.length;i++){
+            var dob = new Date(children[i].dob).toLocaleDateString('en-GB', { day : 'numeric', month : 'short', year : 'numeric' }).split(' ');
+            if(dob[0].length === 1 ){
+                dob[0] = '0' + dob[0];
+            }
+            dob = dob[1] + ' ' + dob[0] + ', ' + dob[2];
+            results_table.innerHTML += `
+            <tr>
+                <td>${children[i].name}</td>
+                <td>${children[i].gender}</td>
+                <td>${dob}</td>
+                <td>${children[i].parent_name}</td>
+                <td>${children[i].parent_phone}</td>
+                <td>${children[i].parent_aadhar}</td>
+            </tr>
+            `;
+        }
+    }
+    function search(){
+        var term = $(this).val().trim();
+        $.ajax({
+            url: "{% url 'search-child' %}",
+            data: {
+                'c': term
+            },
+            type: 'GET',
+            success: function (data, status, xhr) {
+                updateResults(data['children']);
+            },
+            error: function (jqXHR, exception) {
+                Materialize.toast('Some error occurred', 1000);
+            }
+        });
+    }
+    function init(){
+        $('#search').on('input', search);
+    }
+    return {
+        init: init
+    };
+})();
+
 $(document).ready(function () {
     $('main').removeClass('container');
+    ChildSearch.init();
 });
 </script>
 {% endblock %}
