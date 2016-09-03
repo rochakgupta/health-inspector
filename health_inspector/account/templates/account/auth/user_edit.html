@@ -1,0 +1,131 @@
+{% extends 'account/auth/home.html' %}
+{% block title %} Edit Profile {% endblock %}
+{% load material_form %}
+
+{% block extrahead %}
+<style>
+    @media only screen and (min-width : 993px) {
+        header, main{
+            padding-left: 200px;
+        }
+    }
+    @media only screen and (max-width : 992px) {
+        header, main{
+            padding-left: 0px;
+        }
+    }
+    .disabled{
+        color: rgba(0,0,0,0.26);
+        border-bottom: 1px dotted rgba(0,0,0,0.26);
+        cursor: default;'
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col s12 m10 l8 offset-m1 offset-l2">
+        <div class="card-panel" style="margin-top:20px; padding-top: 12px; padding-bottom: 5px;">
+            <div class="row valign-wrapper">
+                <div class="col s12 left-align"><h5> Edit Profile </h5></div>
+            </div>
+            <form action = "{% url 'edit-profile' %}" method='POST'>
+                {% csrf_token %}
+                
+                {% if not request.user.is_parent %}
+                    <div id="parent_checkbox_container" style="margin-top: 10px; margin-bottom: 5px;">
+                        <input type="checkbox" id="parent_checkbox" name="parent_checkbox" />
+                        <label for="parent_checkbox">Register As Parent Too</label>
+                    </div>
+                {% endif %}
+                <div id="parent_form">
+                    {% form form=p %}{% endform %}
+                </div>
+                {% if not request.user.is_doctor %}
+                    <div id="doctor_checkbox_container" style="margin-top: 10px; margin-bottom: 5px;">
+                        <input type="checkbox" id="doctor_checkbox" name="doctor_checkbox" />
+                        <label for="doctor_checkbox">Register As Doctor Too</label>
+                    </div>
+                {% endif %}
+                <div id="doctor_form">
+                    {% form form=d %}{% endform %}
+                </div>
+                {% form form=b %}{% endform %}
+                <div class="row center">
+                    <div class="col s12">
+                        <button type="submit" id ="edit_profile_btn" name="edit_profile" class="btn waves-effect waves-light">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    
+var Parent = (function(){
+    function register_as_parent(choice){
+        var parent_checkbox = document.getElementById('parent_checkbox');
+        if(parent_checkbox){
+            var parent_form = document.getElementById('parent_form').innerHTML;
+            $('#parent_checkbox').change(function(){
+                if($(this).is(':checked')){
+                    document.getElementById('parent_form').innerHTML = parent_form;
+                }
+                else{
+                    parent_form = document.getElementById('parent_form').innerHTML;
+                    document.getElementById('parent_form').innerHTML = '';
+                }
+            });
+            if(choice === 'No' || choice === ''){
+                document.getElementById('parent_form').innerHTML = '';    
+            }
+            else{
+                $('#parent_checkbox').attr('checked', true);
+            }
+        }
+        else{
+            $("#parent_form input[type='text']").addClass('disabled');
+        }
+    }
+    return {
+        init: register_as_parent
+    }
+})();
+    
+var Doctor = (function(){
+    function register_as_doctor(choice){
+        var doctor_checkbox = document.getElementById('doctor_checkbox');
+        if(doctor_checkbox){
+            var doctor_form = document.getElementById('doctor_form').innerHTML;
+            $('#doctor_checkbox').change(function(){
+                if($(this).is(':checked')){
+                    document.getElementById('doctor_form').innerHTML = doctor_form;
+                }
+                else{
+                    doctor_form = document.getElementById('doctor_form').innerHTML;
+                    document.getElementById('doctor_form').innerHTML = '';
+                }
+            });
+            if(choice === 'No' || choice === ''){
+                document.getElementById('doctor_form').innerHTML = '';
+            }
+            else{
+                $('#doctor_checkbox').attr('checked', true);
+            }
+        }
+    }
+    return {
+        init: register_as_doctor
+    }
+})();
+    
+
+$(document).ready(function () {
+    Parent.init('{{ parent_checkbox }}');
+    Doctor.init('{{ doctor_checkbox }}');
+});
+</script>
+{% endblock %}

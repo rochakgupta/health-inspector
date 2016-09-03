@@ -28,12 +28,32 @@
 
 {% block header-content %}
 <ul id="slide-out" class="side-nav fixed" style="width: 200px;">
-    <li style="background-color: #009688;" class="center"><a class="white-text" style="cursor: default;"><b>{{ request.user.first_name }} {% if request.user.last_name %} {{ request.user.last_name }} {% endif %}</b></a></li>
-    <li><a href="{% url 'home' %}" class="teal-text">Home</a></li>
+    <li style="background-color: #009688;" class="center">
+        <a href="{% url 'home' %}" class="white-text bold">
+            <b>{{ request.user.first_name }} {{ request.user.last_name }}</b>
+        </a>
+    </li>
     {% if request.user.is_doctor %}
-    <li><a href="{% url 'signup-parent' %}" class="teal-text">Add Parent</a></li>
-    <li><a href="{% url 'signup-child' %}" class="teal-text">Add Child</a></li>
+    <li><a href="{% url 'signup-parent' %}"><b>Add Parent</b></a></li>
+    <li><a href="{% url 'signup-child' %}"><b>Add Child</b></a></li>
     {% endif %}
+    {% if request.user.is_parent %}
+    {% if children %}
+    <ul class="collapsible collapsible-accordion active">
+        <li class="active">
+            <a class="collapsible-header waves-teal active"><b>My Children</b></a>
+            <div class="collapsible-body">
+            <ul>
+                {% for child in children %}
+                <li><a href="#">{{ child.first_name }} {{ child.last_name }}</a></li>
+                {% endfor %}
+            </ul>
+            </div>
+        </li>
+    </ul>
+    {% endif %}
+    {% endif %}
+    <li><a href="{% url 'edit-profile' %}"><b>Edit Profile</b></a></li>
 </ul>
 {% endblock %}
 

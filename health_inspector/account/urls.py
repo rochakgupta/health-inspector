@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from .views import home, login, signup_doctor, signup_parent, signup_child, logout
+from .views import home, login, signup_doctor, signup_parent, signup_child, logout, edit_profile
 
 urlpatterns = [
     url(r'^$', home, name = "home"),
@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^signup-doctor/$', signup_doctor, name ="signup-doctor" ),
     url(r'^signup-parent/$', signup_parent, name ="signup-parent" ),
     url(r'^signup-child/$', signup_child, name ="signup-child" ),
+    url(r'^edit-profile/$', edit_profile, name ="edit-profile" ),
 ]

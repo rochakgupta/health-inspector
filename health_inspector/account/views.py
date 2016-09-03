@@ -12,7 +12,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db.models import Count
 from .models import CustomUser, Doctor, Parent, Child
-from .forms import LoginForm, BaseSignupForm, DoctorSignupForm, ParentSignupForm, ChildSignupForm
+from .forms import LoginForm, BaseSignupForm, DoctorSignupForm, ParentSignupForm, ChildSignupForm, BaseEditForm, DoctorEditForm, ParentEditForm
 import twilio
 import twilio.rest
 from pprint import pprint
@@ -23,7 +23,7 @@ def home(request):
     if request.user.is_superuser:
         return redirect(reverse('admin:index'))
     else:
-        return render(request, 'account/auth/home.html')
+        return render(request, 'account/auth/home.html', {'children': Child.objects.filter(parent_id=request.user.id)})
 
 @require_http_methods(['GET', 'POST'])
 def login(request):
@@ -70,14 +70,15 @@ def signup_doctor(request):
 def signup_parent(request):
     if not request.user.is_doctor:
         return redirect(reverse('home'))
+    children = Child.objects.filter(parent_id=request.user.id)
     if request.method == 'GET':
-        context = {'b': BaseSignupForm(prefix='b'), 'p': ParentSignupForm(prefix='p')}
+        context = {'b': BaseSignupForm(prefix='b'), 'p': ParentSignupForm(prefix='p'), 'children': children}
         return render(request, 'account/auth/parent_signup.html', context)
     else:
         b = BaseSignupForm(request.POST, prefix='b')
         p = ParentSignupForm(request.POST, prefix='p')
         if not b.is_valid() or not p.is_valid():
-            return render(request, 'account/auth/parent_signup.html', {'b': b, 'p': p})
+            return render(request, 'account/auth/parent_signup.html', {'b': b, 'p': p,  'children': children})
         else:
             custom_user = b.save(commit=False)
             custom_user.username = b.cleaned_data['phone']
@@ -94,18 +95,20 @@ def signup_parent(request):
 def signup_child(request):
     if not request.user.is_doctor:
         return redirect(reverse('home'))
+    children = Child.objects.filter(parent_id=request.user.id)
     if request.method == 'GET':
-        context = {'f': ChildSignupForm()}
+        context = {'f': ChildSignupForm(), 'children': children}
         return render(request, 'account/auth/child_signup.html', context)
     else:
         f = ChildSignupForm(request.POST)
         if not f.is_valid():
-            return render(request, 'account/auth/child_signup.html', {'f': f})
+            return render(request, 'account/auth/child_signup.html', {'f': f, 'children': children})
         else:
             child = f.save(commit=False)
             child.parent = f.valid_parent
             child.save()
             return redirect(reverse('home'))
+        
         
 def logout(request):
 #    client = twilio.rest.TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
@@ -117,6 +120,73 @@ def logout(request):
 #    pprint(obj.__dict__)
     auth_logout(request)
     return redirect(reverse('login'))
+
+
+@login_required
+def edit_profile(request):
+    if request.method == 'GET':
+        context = {'b': BaseEditForm(instance=request.user, prefix='b')}
+        if request.user.is_doctor:
+            context['d'] = DoctorEditForm(instance=Doctor.objects.get(doctor_id=request.user.id), prefix='d')
+        else:
+            context['d'] = DoctorEditForm(prefix='d')
+        if request.user.is_parent:
+            context['p'] = ParentEditForm(instance=Parent.objects.get(parent_id=request.user.id), prefix='p')
+            context['children'] = Child.objects.filter(parent_id=request.user.id)
+        else:
+            context['p'] = ParentEditForm(prefix='p')
+        return render(request, 'account/auth/user_edit.html', context)
+    else:
+        b = BaseEditForm(request.POST, instance=request.user, prefix='b')
+        if request.user.is_doctor:
+            d = DoctorEditForm(request.POST, instance=Doctor.objects.get(doctor_id=request.user.id), prefix='d')
+        else:
+            if request.POST.get('doctor_checkbox'):
+                d = DoctorEditForm(request.POST, prefix='d')
+            else:
+                d = DoctorEditForm(prefix='d')
+        is_parent_form_valid = True
+        if request.user.is_parent:
+            p = ParentEditForm(request.POST, instance=Parent.objects.get(parent_id=request.user.id), prefix='p')
+            p.is_valid()
+            p.errors.pop('aadhar')                
+        else:
+            if request.POST.get('parent_checkbox'):
+                p = ParentEditForm(request.POST, prefix='p')
+                is_parent_form_valid = p.is_valid()
+            else:
+                p = ParentEditForm(prefix='p')
+        if not b.is_valid() or not d.is_valid() or not is_parent_form_valid:
+            context = {'b': b, 'd': d, 'p': p}
+            if request.POST.get('doctor_checkbox'):
+                context['doctor_checkbox'] = 'Yes'
+            else:
+                context['doctor_checkbox'] = 'No'
+            if request.POST.get('parent_checkbox'):
+                context['parent_checkbox'] = 'Yes'
+            else:
+                context['parent_checkbox'] = 'No'
+            if request.user.is_parent: 
+                context['children'] = Child.objects.filter(parent_id=request.user.id)
+            return render(request, 'account/auth/user_edit.html', context)
+        else:
+            custom_user = b.save(commit=False)
+            new_password = b.cleaned_data.get('new_password','')
+            if new_password:
+                custom_user.set_password(new_password)
+            if request.POST.get('doctor_checkbox'):
+                custom_user.is_doctor = True
+                doctor = d.save(commit=False)
+                doctor.doctor = custom_user
+                doctor.save()
+            if request.POST.get('parent_checkbox'):
+                custom_user.is_parent = True
+                parent = p.save(commit=False)
+                parent.parent = custom_user
+                parent.save()
+            custom_user.save()
+            context = {}
+            return redirect(reverse('edit-profile'))
 
 #from django.shortcuts import render, get_object_or_404, redirect
 #from django.http import Http404, JsonResponse, HttpResponse

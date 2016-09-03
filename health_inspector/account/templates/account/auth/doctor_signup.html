@@ -11,8 +11,8 @@
             </div>
             <form action = "{% url 'signup-doctor' %}" method='POST'>
                 {% csrf_token %}
-                {% form form=b %}{% endform %}
                 {% form form=d %}{% endform %}
+                {% form form=b %}{% endform %}
                 <div class="row center">
                     <div class="col s12">
                         <button type="submit" id ="signup_doctor_btn" name="signup_doctor" class="btn waves-effect waves-light">Sign Up</button>

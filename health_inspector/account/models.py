@@ -33,7 +33,7 @@ class CustomUser(AbstractUser):
         
 class Doctor(models.Model):
     doctor = models.OneToOneField(CustomUser, primary_key = True, on_delete=models.CASCADE, related_name="doctor_info")
-    hospital = models.CharField(max_length=128, null=True, blank=True)
+    hospital = models.CharField(max_length=128)
 
     class Meta:
         verbose_name = 'Doctor'
@@ -51,6 +51,9 @@ class Child(models.Model):
     last_name = models.CharField(max_length=30, null=True, blank=True)
     gender = models.CharField(max_length=2, choices=GENDER_CHOICES, default=GENDER_CHOICES[2][0])
     parent = models.ForeignKey(Parent, on_delete=models.CASCADE, related_name="children")
+    
+    def __str__(self):
+        return self.first_name + ' ' + self.last_name
 
     class Meta:
         verbose_name = 'Child'
@@ -62,7 +65,7 @@ class Child(models.Model):
 #    class Meta:
 #        unique_together = ('name',)
 #        verbose_name = 'Disease'
-#        
+
 #class Event(models.Model):
 #    name = 
 
