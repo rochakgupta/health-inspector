@@ -1,0 +1,127 @@
+{% extends 'account/auth/home.html' %}
+
+{% load staticfiles %}
+
+{% block title %} {{ child.first_name }} {{ child.last_name }} | Child's Home {% endblock %}
+{% load material_form %}
+
+{% block extrahead %}
+<link href="{% static 'account/auth/css/child_home.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col s12">
+        <div class="card-panel" style="margin-top:20px;">
+            <div class="card-content">
+                <div class="card-title center" style="border-bottom:5px solid #009688;color:teal;">
+                    <h5>Child Info</h5>
+                </div>
+                <div class="row center" style="margin-top:20px; margin-bottom: 0px;">
+                    <div class="table-container">
+                        <table id="child_table">
+                            <thead>
+                                <tr>
+                                    <th data-field="name">Name</th>
+                                    <th data-field="gender">Gender</th>
+                                    <th data-field="dob">Date of Birth</th>
+                                    <th data-field="parent_name">Parent's Name</th>
+                                    <th data-field="parent_phone">Parent's Phone Number</th>
+                                    <th data-field="parent_aadhar">Parent's Aadhar Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ child.first_name}} {{ child.last_name }}</td>
+                                    <td>{{ child_metadata.gender }}</td>
+                                    <td>{{ child.dob|date:"M d, Y" }}</td>
+                                    <td>{{ child_metadata.parent_name }}</td>
+                                    <td>{{ child_metadata.parent_phone }}</td>
+                                    <td>{{ child_metadata.parent_aadhar }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-panel" style="margin-top:20px;">
+            <div class="card-content">
+                <div class="card-title center" style="border-bottom:5px solid #009688;color:teal;">
+                    <h5>Medical Log</h5>
+                </div>
+                <div class="row center" style="margin-top: 20px; margin-bottom: 0px;">
+                    <div class="table-container">
+                        <table id="tasks_table">
+                            <thead>
+                                <tr>
+                                    <th data-field="name">Name</th>
+                                    <th data-field="category">Category</th>
+                                    <th data-field="reason">Reason</th>
+                                    <th data-field="notes">Notes</th>
+                                    <th data-field="date_created">Date Created</th>
+                                    <th data-field="due_date">Due Date</th>
+                                    <th data-field="given_date">Given Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in tasks %}
+                                <tr>
+                                    <td>
+                                        {% if request.user.id == task.created_by_id and not task.given_date %}
+                                        <a href="{{ task.edit }}">{{ task.name }}</a>
+                                        {% else %}
+                                        {{ task.name }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ task.category }}</td>
+                                    <td>
+                                        {% if task.reason %}
+                                        {{ task.reason }}
+                                        {% else %}
+                                        No Reason Specified
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.notes %}
+                                        {{ task.notes }}
+                                        {% else %}
+                                        No Notes Specified
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ task.date_created|date:"M d, Y" }}</td>
+                                    <td>{{ task.due_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if task.given_date %}
+                                        {{ task.given_date|date:"M d, Y" }}
+                                        {% else %}
+                                        Not Given Yet
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        {% if request.user.is_doctor %}
+        <div class="row center" style="margin-top:5px; margin-bottom: 0px;">
+            <a href="{% url 'create-task' id=child.id %}" class="btn-large red waves-effect waves-light">Create New Task</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function () {
+    $('main').removeClass('container');
+});
+</script>
+{% endblock %}
+  
+        

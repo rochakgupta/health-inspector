@@ -11,11 +11,25 @@ from django.template import loader
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db.models import Count
-from .models import CustomUser, Doctor, Parent, Child
-from .forms import LoginForm, BaseSignupForm, DoctorSignupForm, ParentSignupForm, ChildSignupForm, BaseEditForm, DoctorEditForm, ParentEditForm
+from .models import CustomUser, Doctor, Parent, Child, Task
+from .forms import LoginForm, BaseSignupForm, DoctorSignupForm, ParentSignupForm, ChildSignupForm, BaseEditForm, DoctorEditForm, ParentEditForm, TaskCreateForm, TaskEditForm
 import twilio
 import twilio.rest
 from pprint import pprint
+import json
+
+gender = {
+    'M' : 'Male',
+    'F' : 'Female',
+    'NS' : 'Not Specified'
+}
+
+task_category = {
+    'U': 'Unscheduled Check Up',
+    'S' : 'Scheduled Check Up',
+    'V' : 'Vaccination'
+}
+
 
 @require_GET
 @login_required
@@ -23,7 +37,10 @@ def home(request):
     if request.user.is_superuser:
         return redirect(reverse('admin:index'))
     else:
-        return render(request, 'account/auth/home.html', {'children': Child.objects.filter(parent_id=request.user.id)})
+        context = {'children': Child.objects.filter(parent_id=request.user.id)}
+        if request.user.is_doctor:
+            context['doctor_tasks'] = Task.objects.filter(created_by=request.user.doctor_info)
+        return render(request, 'account/auth/home.html', context)
 
 @require_http_methods(['GET', 'POST'])
 def login(request):
@@ -67,6 +84,7 @@ def signup_doctor(request):
             return redirect(reverse('home'))
         
 @login_required
+@require_http_methods(['GET', 'POST'])
 def signup_parent(request):
     if not request.user.is_doctor:
         return redirect(reverse('home'))
@@ -75,6 +93,7 @@ def signup_parent(request):
         context = {'b': BaseSignupForm(prefix='b'), 'p': ParentSignupForm(prefix='p'), 'children': children}
         return render(request, 'account/auth/parent_signup.html', context)
     else:
+        pprint(json.dumps(request.POST, indent=4, sort_keys=True))
         b = BaseSignupForm(request.POST, prefix='b')
         p = ParentSignupForm(request.POST, prefix='p')
         if not b.is_valid() or not p.is_valid():
@@ -92,6 +111,7 @@ def signup_parent(request):
             return redirect(reverse('home'))
         
 @login_required
+@require_http_methods(['GET', 'POST'])
 def signup_child(request):
     if not request.user.is_doctor:
         return redirect(reverse('home'))
@@ -109,20 +129,14 @@ def signup_child(request):
             child.save()
             return redirect(reverse('home'))
         
-        
+
 def logout(request):
-#    client = twilio.rest.TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-#    obj = client.messages.create(
-#        body='You are now logging out',
-#        to='+91' + request.user.phone,
-#        from_=settings.TWILIO_PHONE_NUMBER
-#    )
-#    pprint(obj.__dict__)
     auth_logout(request)
     return redirect(reverse('login'))
 
 
 @login_required
+@require_http_methods(['GET', 'POST'])
 def edit_profile(request):
     if request.method == 'GET':
         context = {'b': BaseEditForm(instance=request.user, prefix='b')}
@@ -137,6 +151,7 @@ def edit_profile(request):
             context['p'] = ParentEditForm(prefix='p')
         return render(request, 'account/auth/user_edit.html', context)
     else:
+        pprint(json.dumps(request.POST, indent=4, sort_keys=True))
         b = BaseEditForm(request.POST, instance=request.user, prefix='b')
         if request.user.is_doctor:
             d = DoctorEditForm(request.POST, instance=Doctor.objects.get(doctor_id=request.user.id), prefix='d')
@@ -196,11 +211,6 @@ def search_child(request):
         return JsonResponse(data)
     custom_users = CustomUser.objects.filter(Q(phone__startswith=query_term) & Q(is_parent=True))
     children = []
-    gender = {
-        'M' : 'Male',
-        'F' : 'Female',
-        'NS' : 'Not Specified'
-    }
     for custom_user in custom_users:
         parent_children = Child.objects.filter(parent_id=custom_user.id)
         children = children + [{
@@ -209,11 +219,88 @@ def search_child(request):
                 'dob': parent_child.dob,
                 'parent_name': custom_user.first_name + ' ' + custom_user.last_name,
                 'parent_phone': custom_user.phone,
-                'parent_aadhar': Parent.objects.get(parent=custom_user).aadhar
+                'parent_aadhar': Parent.objects.get(parent=custom_user).aadhar,
+                'home': reverse('home-child', kwargs={'id': parent_child.id})
             } for parent_child in parent_children
         ]
     data['children'] = children
     return JsonResponse(data)
+
+@login_required
+def home_child(request, id=None):
+    child_obj = get_object_or_404(Child, id=id)
+    if request.user.is_doctor or (request.user.is_parent and child_obj.parent_id == request.user.id):
+        child_metadata = {}
+        child_metadata['parent_name'] = child_obj.parent.parent.first_name + ' ' + child_obj.parent.parent.last_name
+        child_metadata['parent_phone'] = child_obj.parent.parent.phone
+        child_metadata['parent_aadhar'] = child_obj.parent.aadhar 
+        child_metadata['gender'] = gender[child_obj.gender]
+        tasks = [
+            {
+                'category': task_category[task.category],
+                'name': task.name,
+                'reason': task.reason,
+                'notes': task.notes,
+                'date_created': task.date_created,
+                'due_date': task.due_date,
+                'given_date': task.given_date,
+                'created_by_id': task.created_by.doctor_id,
+                'edit': reverse('edit-task', kwargs={'id': id, 't_id': task.id})
+            } for task in Task.objects.filter(child=child_obj).order_by('due_date')
+        ]
+        return render(request, 'account/auth/child_home.html', {'child': child_obj, 'child_metadata': child_metadata, 'children': Child.objects.filter(parent_id=request.user.id), 'tasks': tasks})
+    else:
+        return redirect(reverse('home'))
+    
+@login_required
+@require_http_methods(['GET', 'POST'])
+def create_task(request, id=None):
+    child_obj = get_object_or_404(Child, id=id)
+    if request.user.is_doctor:
+        if request.method == 'GET':
+            context = {'t': TaskCreateForm(), 'child_obj': child_obj}
+            return render(request, 'account/auth/task_create.html', context)
+        else:
+            t = TaskCreateForm(request.POST)
+            if not t.is_valid():
+                return render(request, 'account/auth/task_create.html', {'t': t, 'child_obj': child_obj})
+            else:
+                task = t.save(commit=False)
+                task.created_by=request.user.doctor_info
+                task.child = child_obj
+                if task.category != 'U':
+                    client = twilio.rest.TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+                    custom_user_obj = CustomUser.objects.get(id=task.created_by.doctor_id)
+                    message = 'You are scheduled for the "' + task_category[task.category] + ' - ' + task.name + '" by ' + 'Dr. ' + custom_user_obj.first_name + ' ' + custom_user_obj.last_name + ' of your child ' + child_obj.first_name + ' ' + child_obj.last_name + ' at ' + task.created_by.hospital + ' on ' + task.due_date.strftime('%-d %b, %Y')
+                    obj = client.messages.create(
+                        body=message,
+                        to='+91' + CustomUser.objects.get(id=child_obj.parent_id).phone,
+                        from_=settings.TWILIO_PHONE_NUMBER
+                    )
+                task.save()
+                return redirect(reverse('home-child', kwargs={'id': id}))
+    else:
+        return redirect(reverse('home-child', kwargs={'id': id}))
+    
+@login_required
+@require_http_methods(['GET', 'POST'])
+def edit_task(request, id=None, t_id=None):
+    child_obj = get_object_or_404(Child, id=id)
+    task_obj = get_object_or_404(Task, id=t_id)
+    if request.user.id == task_obj.created_by.doctor_id:
+        if request.method == 'GET':
+            context = {'t': TaskEditForm(instance=task_obj), 'task': task_obj}
+            return render(request, 'account/auth/task_edit.html', context)
+        else:
+            t = TaskEditForm(request.POST, instance=task_obj)
+            if not t.is_valid():
+                return render(request, 'account/auth/task_edit.html', {'t': t, 'task': task_obj})
+            else:
+                task = t.save(commit=False)
+                task.save()
+                return redirect(reverse('home-child', kwargs={'id': id}))
+    else:
+        return redirect(reverse('home-child', kwargs={'id': id}))
 
 #from django.shortcuts import render, get_object_or_404, redirect
 #from django.http import Http404, JsonResponse, HttpResponse

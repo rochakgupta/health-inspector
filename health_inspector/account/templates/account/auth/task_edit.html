@@ -1,0 +1,43 @@
+{% extends 'account/auth/home.html' %}
+{% block title %} Edit Task - {{ task.child.first_name }} {{ task.child.last_name }} {% endblock %}
+{% load material_form %}
+
+{% block extrahead %}
+<style>
+    @media only screen and (min-width : 993px) {
+        header, main{
+            padding-left: 200px;
+        }
+    }
+    @media only screen and (max-width : 992px) {
+        header, main{
+            padding-left: 0px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col s12 m10 l8 offset-m1 offset-l2">
+        <div class="card-panel" style="margin-top:20px; padding-top: 12px; padding-bottom: 5px;">
+            <div class="row valign-wrapper">
+                <div class="col s12 left-align"><h5> Edit Task - {{ task.child.first_name }} {{ task.child.last_name }} </h5></div>
+            </div>
+            <form action = "{% url 'edit-task' id=task.child.id t_id=task.id %}" method='POST'>
+                {% csrf_token %}
+                {% form form=t %}{% endform %}
+                <div class="row center">
+                    <div class="col s12">
+                        <button type="submit" id ="edit_task_btn" name="edit_task" class="btn waves-effect waves-light">Edit Task</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script></script>
+{% endblock %}

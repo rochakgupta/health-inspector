@@ -3,12 +3,12 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from material import *
-from .models import CustomUser, Doctor, Parent, Child
+from .models import CustomUser, Doctor, Parent, Child, Task
 from datetime import date, datetime
 
 def phone_validator(val):
     if not re.match('^[789]\d{9}$', val):
-        raise forms.ValidationError('Should be a 10 digit valid phone number')
+        raise ValidationError('Should be a 10 digit valid phone number')
         
 def aadhar_validator(val):
     if not re.match('^\d{16}$', val):
@@ -64,7 +64,7 @@ class BaseSignupForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ['phone', 'first_name', 'last_name', 'gender']
+        fields = ['phone', 'first_name', 'last_name', 'gender','street','district', 'city', 'state', 'zipcode']
         
 class DoctorSignupForm(forms.ModelForm):
 
@@ -161,7 +161,7 @@ class BaseEditForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ['phone', 'first_name', 'last_name', 'gender']
+        fields = ['phone', 'first_name', 'last_name', 'gender','street','district', 'city', 'state', 'zipcode']
         
 class DoctorEditForm(forms.ModelForm):
 
@@ -183,9 +183,49 @@ class ParentEditForm(forms.ModelForm):
     def clean_aadhar(self):
         data_aadhar = self.cleaned_data.get('aadhar', '')
         if data_aadhar and Parent.objects.filter(aadhar = data_aadhar).exists():
-            raise forms.ValidationError('This aadhar number is already registered with')
+            raise forms.ValidationError('This aadhar number is already registered with.')
         return data_aadhar
 
     class Meta:
         model = Parent
         fields = ['aadhar']
+        
+class TaskCreateForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(TaskCreateForm, self).__init__(*args, **kwargs)
+        self.fields['due_date'].label = 'Due Date'
+        self.fields['due_date'].initial = datetime.now()
+        
+    def clean_due_date(self):
+        data_due_date = self.cleaned_data.get('due_date', datetime.now())
+        if data_due_date < date.today():
+            raise forms.ValidationError('Due Date cannot be in the past.')
+        return data_due_date
+
+    class Meta:
+        model = Task
+        fields = ['category', 'name', 'reason', 'due_date']
+        
+class TaskEditForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(TaskEditForm, self).__init__(*args, **kwargs)
+        self.fields['due_date'].disabled = True
+        self.fields['due_date'].widget.attrs['disabled'] = 'disabled'
+        self.fields['given_date'].required = True
+        self.fields['given_date'].label = 'Given Date'
+        
+    def clean_given_date(self):
+        data_given_date = self.cleaned_data.get('given_date', None)
+        print(self.instance.due_date)
+        if data_given_date:
+            if data_given_date < self.instance.due_date:
+                raise forms.ValidationError('Given Date cannot precede Due Date.')
+            elif data_given_date > date.today():
+                raise forms.ValidationError('Given Date cannot be in the future.')
+        return data_given_date
+
+    class Meta:
+        model = Task
+        fields = ['category', 'name', 'reason', 'notes', 'due_date', 'given_date']

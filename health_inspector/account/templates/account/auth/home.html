@@ -2,7 +2,7 @@
 
 {% load staticfiles %}
 
-{% block title %} Home {% endblock %}
+{% block title %} {{ request.user.first_name }} {{ request.user.last_name }} | Home {% endblock %}
 {% load material_form %}
 
 {% block extrahead %}
@@ -28,7 +28,7 @@
             <div class="collapsible-body">
             <ul>
                 {% for child in children %}
-                <li><a href="#">{{ child.first_name }} {{ child.last_name }}</a></li>
+                <li><a href="{% url 'home-child' id=child.id %}">{{ child.first_name }} {{ child.last_name }}</a></li>
                 {% endfor %}
             </ul>
             </div>
@@ -67,7 +67,6 @@
                 <div class="row center" style="margin-top:5px; margin-bottom: 0px;" id="search-div">
                     <input class="left col s12 m4 offset-m4" type="text" id="search" placeholder="Search Child By Parent's Phone Number" autocomplete="off">
                 </div>
-                
             </div>
         </div>
         <div class="card-panel" style="margin-top:20px;">
@@ -112,7 +111,7 @@ ChildSearch = (function () {
             dob = dob[1] + ' ' + dob[0] + ', ' + dob[2];
             results_table.innerHTML += `
             <tr>
-                <td>${children[i].name}</td>
+                <td><a href="${children[i].home}">${children[i].name}</a></td>
                 <td>${children[i].gender}</td>
                 <td>${dob}</td>
                 <td>${children[i].parent_name}</td>
