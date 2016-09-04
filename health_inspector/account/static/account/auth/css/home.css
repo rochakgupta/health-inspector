@@ -1,0 +1,60 @@
+
+table{
+    border: 1px solid rgb(208,208,208);
+}
+
+th, td{
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+td:not(:last-child),
+th:not(:last-child){
+    border-right: 1px solid rgb(208,208,208);
+}
+
+tr:not(:last-child){
+    border-bottom: 1px solid rgb(208,208,208);
+}
+.table-container{
+    width: 100%;
+    overflow-y: auto;
+    margin: 0;
+}
+tr > th:nth-child(1), tr > td:nth-child(1),
+tr > th:nth-child(4), tr > td:nth-child(4){
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+}
+tr > th:nth-child(2), tr > td:nth-child(2),
+tr > th:nth-child(3), tr > td:nth-child(3){
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
+tr > th:nth-child(5), tr > td:nth-child(5),
+tr > th:nth-child(6), tr > td:nth-child(6){
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+}
+main{
+    padding-right: 10px;
+}
+@media only screen and (min-width : 993px) {
+    header{
+        padding-left: 200px;
+    }
+    main{
+        padding-left: 210px;
+    }
+}
+@media only screen and (max-width : 992px) {
+    header{
+        padding-left: 0px;
+    }
+    main{
+        padding-left: 10px;
+    }
+}
