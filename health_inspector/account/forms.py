@@ -192,16 +192,21 @@ class ParentEditForm(forms.ModelForm):
         
 class TaskCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
+        self.child_obj = kwargs.pop('child_obj')
         super(TaskCreateForm, self).__init__(*args, **kwargs)
         self.fields['due_date'].label = 'Due Date'
         self.fields['due_date'].initial = datetime.now()
         
     def clean_name(self):
-        VACCINE_CHOICES = [vaccine.name for vaccine in Vaccine.objects.all()]
+        ALL_VACCINE_CHOICES = [vaccine.name for vaccine in Vaccine.objects.all()]
+        CREATED_VACCINE_CHOICES = [task.name for task in Task.objects.filter(child=self.child_obj, category='V')]
         data_name = self.cleaned_data.get('name')
         data_category = self.cleaned_data.get('category')
-        if data_category == 'V' and data_name not in VACCINE_CHOICES:
-            raise forms.ValidationError('Choose a valid vaccine')
+        if data_category == 'V':
+            if data_name in CREATED_VACCINE_CHOICES:
+                raise forms.ValidationError('Task already created for this vaccine')
+            elif data_name not in ALL_VACCINE_CHOICES: 
+                raise forms.ValidationError('Choose a valid vaccine')
         return data_name
     
     def clean_due_date(self):

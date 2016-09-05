@@ -267,11 +267,11 @@ def create_task(request, id=None):
     child_obj = get_object_or_404(Child, id=id)
     if request.user.is_doctor:
         if request.method == 'GET':
-            context = {'t': TaskCreateForm(), 'child_obj': child_obj}
+            context = {'t': TaskCreateForm(child_obj=child_obj), 'child_obj': child_obj}
             return render(request, 'account/auth/task_create.html', context)
         else:
 #            pprint(json.dumps(request.POST, indent=4, sort_keys=True))
-            t = TaskCreateForm(request.POST)
+            t = TaskCreateForm(request.POST,child_obj=child_obj)
             if not t.is_valid():
                 return render(request, 'account/auth/task_create.html', {'t': t, 'child_obj': child_obj})
             else:
