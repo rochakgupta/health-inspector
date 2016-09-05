@@ -65,11 +65,11 @@
                                     <td>{{ vaccine.name }}</td>
                                     <td>
                                         {% if vaccine.status %}
-                                        <input type="checkbox" id="id_vaccination_{{ forloop.counter }}" class="disabled" style="cursor: auto;" checked disabled>
+                                        <input type="checkbox" id="id_vaccination_{{ forloop.counter }}" checked>
                                         {% else %}
-                                        <input type="checkbox" id="id_vaccination_{{ forloop.counter }}" class="disabled" style="cursor: auto;" disabled>
+                                        <input type="checkbox" id="id_vaccination_{{ forloop.counter }}">
                                         {% endif %}
-                                        <label for="id_vaccination_{{ forloop.counter }}"></label>
+                                        <label for="id_vaccination_{{ forloop.counter }}" style="cursor: default;"></label>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -154,6 +154,7 @@
 <script>
 $(document).ready(function () {
     $('main').removeClass('container');
+    $(":checkbox").on("click", false);
 });
 </script>
 {% endblock %}
