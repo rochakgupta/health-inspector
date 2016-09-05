@@ -48,6 +48,40 @@
         <div class="card-panel" style="margin-top:20px;">
             <div class="card-content">
                 <div class="card-title center" style="border-bottom:5px solid #009688;color:teal;">
+                    <h5>Vaccine Health Card</h5>
+                </div>
+                <div class="row center" style="margin-top:20px; margin-bottom: 0px;">
+                    <div class="table-container">
+                        <table id="health_table" class="centered">
+                            <thead>
+                                <tr>
+                                    <th data-field="name">Vaccine Name</th>
+                                    <th data-field="done_status">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for vaccine in vaccines %}
+                                <tr>
+                                    <td>{{ vaccine.name }}</td>
+                                    <td>
+                                        {% if vaccine.status %}
+                                        <input type="checkbox" id="id_vaccination_{{ forloop.counter }}" class="disabled" style="cursor: auto;" checked disabled>
+                                        {% else %}
+                                        <input type="checkbox" id="id_vaccination_{{ forloop.counter }}" class="disabled" style="cursor: auto;" disabled>
+                                        {% endif %}
+                                        <label for="id_vaccination_{{ forloop.counter }}"></label>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-panel" style="margin-top:20px;">
+            <div class="card-content">
+                <div class="card-title center" style="border-bottom:5px solid #009688;color:teal;">
                     <h5>Medical Log</h5>
                 </div>
                 <div class="row center" style="margin-top: 20px; margin-bottom: 0px;">

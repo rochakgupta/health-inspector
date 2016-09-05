@@ -3,7 +3,7 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from material import *
-from .models import CustomUser, Doctor, Parent, Child, Task
+from .models import CustomUser, Doctor, Parent, Child, Task, Vaccine
 from datetime import date, datetime
 
 def phone_validator(val):
@@ -191,28 +191,38 @@ class ParentEditForm(forms.ModelForm):
         fields = ['aadhar']
         
 class TaskCreateForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         super(TaskCreateForm, self).__init__(*args, **kwargs)
         self.fields['due_date'].label = 'Due Date'
         self.fields['due_date'].initial = datetime.now()
         
+    def clean_name(self):
+        VACCINE_CHOICES = [vaccine.name for vaccine in Vaccine.objects.all()]
+        data_name = self.cleaned_data.get('name')
+        data_category = self.cleaned_data.get('category')
+        if data_category == 'V' and data_name not in VACCINE_CHOICES:
+            raise forms.ValidationError('Choose a valid vaccine')
+        return data_name
+    
     def clean_due_date(self):
         data_due_date = self.cleaned_data.get('due_date', datetime.now())
         if data_due_date < date.today():
             raise forms.ValidationError('Due Date cannot be in the past.')
         return data_due_date
-
+    
     class Meta:
         model = Task
         fields = ['category', 'name', 'reason', 'due_date']
         
 class TaskEditForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         super(TaskEditForm, self).__init__(*args, **kwargs)
         self.fields['due_date'].disabled = True
         self.fields['due_date'].widget.attrs['disabled'] = 'disabled'
+        self.fields['category'].disabled = True
+        self.fields['category'].widget.attrs['disabled'] = 'disabled'
+        self.fields['name'].disabled = True
+        self.fields['name'].widget.attrs['disabled'] = 'disabled'
         self.fields['given_date'].required = True
         self.fields['given_date'].label = 'Given Date'
         

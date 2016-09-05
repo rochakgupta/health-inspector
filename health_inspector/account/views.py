@@ -11,7 +11,7 @@ from django.template import loader
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db.models import Count
-from .models import CustomUser, Doctor, Parent, Child, Task
+from .models import CustomUser, Doctor, Parent, Child, Task, Vaccine
 from .forms import LoginForm, BaseSignupForm, DoctorSignupForm, ParentSignupForm, ChildSignupForm, BaseEditForm, DoctorEditForm, ParentEditForm, TaskCreateForm, TaskEditForm
 import twilio
 import twilio.rest
@@ -248,7 +248,16 @@ def home_child(request, id=None):
                 'edit': reverse('edit-task', kwargs={'id': id, 't_id': task.id})
             } for task in Task.objects.filter(child=child_obj).order_by('due_date')
         ]
-        return render(request, 'account/auth/child_home.html', {'child': child_obj, 'child_metadata': child_metadata, 'children': Child.objects.filter(parent_id=request.user.id), 'tasks': tasks})
+        vaccines = []
+        for vaccine in Vaccine.objects.all():
+            out = {}
+            out['name'] = vaccine.name
+            out['status'] = False
+            task_list = Task.objects.filter(child=child_obj,category='V', name=vaccine.name)
+            if task_list and task_list[0].given_date:
+                out['status'] = True
+            vaccines.append(out)
+        return render(request, 'account/auth/child_home.html', {'child': child_obj, 'child_metadata': child_metadata, 'children': Child.objects.filter(parent_id=request.user.id), 'tasks': tasks, 'vaccines': vaccines})
     else:
         return redirect(reverse('home'))
     
@@ -261,6 +270,7 @@ def create_task(request, id=None):
             context = {'t': TaskCreateForm(), 'child_obj': child_obj}
             return render(request, 'account/auth/task_create.html', context)
         else:
+#            pprint(json.dumps(request.POST, indent=4, sort_keys=True))
             t = TaskCreateForm(request.POST)
             if not t.is_valid():
                 return render(request, 'account/auth/task_create.html', {'t': t, 'child_obj': child_obj})
@@ -269,14 +279,17 @@ def create_task(request, id=None):
                 task.created_by=request.user.doctor_info
                 task.child = child_obj
                 if task.category != 'U':
-                    client = twilio.rest.TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-                    custom_user_obj = CustomUser.objects.get(id=task.created_by.doctor_id)
-                    message = 'You are scheduled for the "' + task_category[task.category] + ' - ' + task.name + '" by ' + 'Dr. ' + custom_user_obj.first_name + ' ' + custom_user_obj.last_name + ' of your child ' + child_obj.first_name + ' ' + child_obj.last_name + ' at ' + task.created_by.hospital + ' on ' + task.due_date.strftime('%-d %b, %Y')
-                    obj = client.messages.create(
-                        body=message,
-                        to='+91' + CustomUser.objects.get(id=child_obj.parent_id).phone,
-                        from_=settings.TWILIO_PHONE_NUMBER
-                    )
+                    try:
+                        client = twilio.rest.TwilioRestClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+                        custom_user_obj = CustomUser.objects.get(id=task.created_by.doctor_id)
+                        message = 'You are scheduled for the "' + task_category[task.category] + ' - ' + task.name + '" by ' + 'Dr. ' + custom_user_obj.first_name + ' ' + custom_user_obj.last_name + ' of your child ' + child_obj.first_name + ' ' + child_obj.last_name + ' at ' + task.created_by.hospital + ' on ' + task.due_date.strftime('%-d %b, %Y')
+                        obj = client.messages.create(
+                            body=message,
+                            to='+91' + CustomUser.objects.get(id=child_obj.parent_id).phone,
+                            from_=settings.TWILIO_PHONE_NUMBER
+                        )
+                    except:
+                        print('Twilio server not found')
                 task.save()
                 return redirect(reverse('home-child', kwargs={'id': id}))
     else:
