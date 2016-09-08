@@ -56,6 +56,7 @@
                             <thead>
                                 <tr>
                                     <th data-field="name">Vaccine Name</th>
+                                    <th data-field="within">To Be Given Within</th>
                                     <th data-field="done_status">Status</th>
                                 </tr>
                             </thead>
@@ -63,6 +64,7 @@
                                 {% for vaccine in vaccines %}
                                 <tr>
                                     <td>{{ vaccine.name }}</td>
+                                    <td>{{ vaccine.start|date:"M d, Y" }} - {{ vaccine.end|date:"M d, Y" }}</td>
                                     <td>
                                         {% if vaccine.status %}
                                         <input type="checkbox" id="id_vaccination_{{ forloop.counter }}" checked>

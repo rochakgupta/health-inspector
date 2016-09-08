@@ -252,6 +252,8 @@ def home_child(request, id=None):
         for vaccine in Vaccine.objects.all():
             out = {}
             out['name'] = vaccine.name
+            out['start'] = child_obj.dob + vaccine.base
+            out['end'] = child_obj.dob + vaccine.base + vaccine.delta
             out['status'] = False
             task_list = Task.objects.filter(child=child_obj,category='V', name=vaccine.name)
             if task_list and task_list[0].given_date:
