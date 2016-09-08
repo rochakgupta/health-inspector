@@ -142,7 +142,7 @@
             </div>
         </div>
         {% if request.user.is_doctor %}
-        <div class="row center" style="margin-top:5px; margin-bottom: 0px;">
+        <div class="row center" style="margin-top:20px; margin-bottom: 0px;">
             <a href="{% url 'create-task' id=child.id %}" class="btn-large red waves-effect waves-light">Create New Task</a>
         </div>
         {% endif %}
