@@ -60,16 +60,20 @@
 </div>
 -->
 {% if request.user.is_doctor %}
-<div class="row">
-    <div class="col s12">
+<div class="row" style="margin-bottom: 0;">
+    <div class="col s12 m4 offset-m4">
         <div class="card-panel" style="margin-top:20px;">
             <div class="card-content">
                 <div class="row center" style="margin-top:5px; margin-bottom: 0px;" id="search-div">
-                    <input class="left col s12 m4 offset-m4" type="text" id="search" placeholder="Search Child By Parent's Phone Number" autocomplete="off">
+                    <input class="left col s12" type="text" id="search" placeholder="Search Child By Parent's Phone Number" autocomplete="off">
                 </div>
             </div>
         </div>
-        <div class="card-panel" style="margin-top:20px;">
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <div class="card-panel" style="margin-top:5px;">
             <div class="card-content">
                 <div class="row" style="margin-top:5px; margin-bottom: 0px;">
                     <div class="table-container">
