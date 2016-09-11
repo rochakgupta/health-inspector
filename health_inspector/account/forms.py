@@ -214,9 +214,11 @@ class TaskCreateForm(forms.ModelForm):
         if data_due_date < date.today():
             raise forms.ValidationError('Due Date cannot be in the past.')
         if self.cleaned_data.get('category') == 'V':
-            v = Vaccine.objects.get(name=self.cleaned_data.get('name'))
-            if data_due_date < self.child_obj.dob + v.base or data_due_date > self.child_obj.dob + v.base + v.delta:
-                raise forms.ValidationError('The selected vaccine cannot be given on this date')
+            v = Vaccine.objects.filter(name=self.cleaned_data.get('name'))
+            if len(v) != 0:
+                v = v[0]
+                if data_due_date < self.child_obj.dob + v.base or data_due_date > self.child_obj.dob + v.base + v.delta:
+                    raise forms.ValidationError('The selected vaccine cannot be given on this date')
         return data_due_date
     
     class Meta:
