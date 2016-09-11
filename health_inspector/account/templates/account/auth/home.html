@@ -41,27 +41,9 @@
 {% endblock %}
 
 {% block content %}
-<!--
-<div class="row center">
-    <div class="col s12 m6">
-        <div class="card-panel" style="margin-top:20px; padding-top: 12px; padding-bottom: 0px; border: 1px solid white;">
-            <div class="row valign-wrapper center">
-                <div class="col s12"><h5>Home</h5></div>
-            </div>
-        </div>
-    </div>
-    <div class="col s12 m6">
-        <div class="card-panel" style="margin-top:20px; padding-top: 12px; padding-bottom: 0px; border: 1px solid white;">
-            <div class="row valign-wrapper center">
-                <div class="col s12"><h5>Home</h5></div>
-            </div>
-        </div>
-    </div>
-</div>
--->
 {% if request.user.is_doctor %}
 <div class="row" style="margin-bottom: 0;">
-    <div class="col s12 m4 offset-m4">
+    <div class="col s12 m6 l4 offset-m3 offset-l4">
         <div class="card-panel" style="margin-top:20px;">
             <div class="card-content">
                 <div class="row center" style="margin-top:5px; margin-bottom: 0px;" id="search-div">
@@ -80,12 +62,12 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th data-field="name">Name</th>
-                                    <th data-field="gender">Gender</th>
-                                    <th data-field="dob">Date of Birth</th>
-                                    <th data-field="parent_name">Parent's Name</th>
-                                    <th data-field="parent_phone">Parent's Phone Number</th>
-                                    <th data-field="parent_aadhar">Parent's Aadhar Number</th>
+                                    <th data-field="name" nowrap>Name</th>
+                                    <th data-field="gender" nowrap>Gender</th>
+                                    <th data-field="dob" nowrap>Date of Birth</th>
+                                    <th data-field="parent_name" nowrap>Parent's Name</th>
+                                    <th data-field="parent_phone" nowrap>Parent's Phone Number</th>
+                                    <th data-field="parent_aadhar" nowrap>Parent's Aadhar Number</th>
                                 </tr>
                             </thead>
                             <tbody id="results">
@@ -115,12 +97,12 @@ ChildSearch = (function () {
             dob = dob[1] + ' ' + dob[0] + ', ' + dob[2];
             results_table.innerHTML += `
             <tr>
-                <td><a href="${children[i].home}">${children[i].name}</a></td>
-                <td>${children[i].gender}</td>
-                <td>${dob}</td>
-                <td>${children[i].parent_name}</td>
-                <td>${children[i].parent_phone}</td>
-                <td>${children[i].parent_aadhar}</td>
+                <td nowrap><a href="${children[i].home}">${children[i].name}</a></td>
+                <td nowrap>${children[i].gender}</td>
+                <td nowrap>${dob}</td>
+                <td nowrap>${children[i].parent_name}</td>
+                <td nowrap>${children[i].parent_phone}</td>
+                <td nowrap>${children[i].parent_aadhar}</td>
             </tr>
             `;
         }

@@ -21,7 +21,7 @@ tr:not(:last-child){
     overflow-y: auto;
     margin: 0;
 }
-tr > th:nth-child(1), tr > td:nth-child(1),
+/*tr > th:nth-child(1), tr > td:nth-child(1),
 tr > th:nth-child(4), tr > td:nth-child(4){
     width: 120px !important;
     min-width: 120px !important;
@@ -38,7 +38,7 @@ tr > th:nth-child(6), tr > td:nth-child(6){
     width: 180px !important;
     min-width: 180px !important;
     max-width: 180px !important;
-}
+}*/
 main{
     padding-right: 10px;
 }

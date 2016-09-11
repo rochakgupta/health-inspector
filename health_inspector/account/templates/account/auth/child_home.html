@@ -22,22 +22,22 @@
                         <table id="child_table">
                             <thead>
                                 <tr>
-                                    <th data-field="name">Name</th>
-                                    <th data-field="gender">Gender</th>
-                                    <th data-field="dob">Date of Birth</th>
-                                    <th data-field="parent_name">Parent's Name</th>
-                                    <th data-field="parent_phone">Parent's Phone Number</th>
-                                    <th data-field="parent_aadhar">Parent's Aadhar Number</th>
+                                    <th data-field="name" nowrap>Name</th>
+                                    <th data-field="gender" nowrap>Gender</th>
+                                    <th data-field="dob" nowrap>Date of Birth</th>
+                                    <th data-field="parent_name" nowrap>Parent's Name</th>
+                                    <th data-field="parent_phone" nowrap>Parent's Phone Number</th>
+                                    <th data-field="parent_aadhar" nowrap>Parent's Aadhar Number</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{{ child.first_name}} {{ child.last_name }}</td>
-                                    <td>{{ child_metadata.gender }}</td>
-                                    <td>{{ child.dob|date:"M d, Y" }}</td>
-                                    <td>{{ child_metadata.parent_name }}</td>
-                                    <td>{{ child_metadata.parent_phone }}</td>
-                                    <td>{{ child_metadata.parent_aadhar }}</td>
+                                    <td nowrap>{{ child.first_name}} {{ child.last_name }}</td>
+                                    <td nowrap>{{ child_metadata.gender }}</td>
+                                    <td nowrap>{{ child.dob|date:"M d, Y" }}</td>
+                                    <td nowrap>{{ child_metadata.parent_name }}</td>
+                                    <td nowrap>{{ child_metadata.parent_phone }}</td>
+                                    <td nowrap>{{ child_metadata.parent_aadhar }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -55,29 +55,29 @@
                         <table id="health_table" class="centered">
                             <thead>
                                 <tr>
-                                    <th data-field="name">Vaccine Name</th>
-                                    <th data-field="within">To Be Given Within</th>
-                                    <th data-field="done_status">Status</th>
+                                    <th data-field="name" nowrap>Vaccine Name</th>
+                                    <th data-field="within" nowrap>To Be Given Within</th>
+                                    <th data-field="done_status" nowrap>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for vaccine in vaccines %}
                                 <tr>
-                                    <td>{{ vaccine.name }}</td>
-                                    <td>
-                                        <div class="row" style="margin:0;">
-                                            <div class="col s5">
+                                    <td nowrap>{{ vaccine.name }}</td>
+                                    <td nowrap>
+                                        <div style="display:flex; justify-content:space-around; align-items:center;">
+                                            <div>
                                                 {{ vaccine.start|date:"M d, Y" }}
                                             </div>
-                                            <div class="col s2">
-                                                -----
+                                            <div style="margin-left: 5px; margin-right: 5px;">
+                                                ---
                                             </div>
-                                            <div class="col s5">
+                                            <div>
                                                 {{ vaccine.end|date:"M d, Y" }}
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td nowrap>
                                         {% if vaccine.status %}
                                         <input type="checkbox" id="id_vaccination_{{ forloop.counter }}" checked>
                                         {% else %}
@@ -103,43 +103,43 @@
                         <table id="tasks_table">
                             <thead>
                                 <tr>
-                                    <th data-field="name">Name</th>
-                                    <th data-field="category">Category</th>
-                                    <th data-field="reason">Reason</th>
-                                    <th data-field="notes">Notes</th>
-                                    <th data-field="date_created">Date Created</th>
-                                    <th data-field="due_date">Due Date</th>
-                                    <th data-field="given_date">Given Date</th>
+                                    <th data-field="name" nowrap>Name</th>
+                                    <th data-field="category" nowrap>Category</th>
+                                    <th data-field="reason" nowrap>Reason</th>
+                                    <th data-field="notes" nowrap>Notes</th>
+                                    <th data-field="date_created" nowrap>Date Created</th>
+                                    <th data-field="due_date" nowrap>Due Date</th>
+                                    <th data-field="given_date" nowrap>Given Date</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for task in tasks %}
                                 <tr>
-                                    <td>
+                                    <td nowrap>
                                         {% if request.user.id == task.created_by_id and not task.given_date %}
                                         <a href="{{ task.edit }}">{{ task.name }}</a>
                                         {% else %}
                                         {{ task.name }}
                                         {% endif %}
                                     </td>
-                                    <td>{{ task.category }}</td>
-                                    <td>
+                                    <td nowrap>{{ task.category }}</td>
+                                    <td nowrap>
                                         {% if task.reason %}
                                         {{ task.reason }}
                                         {% else %}
                                         No Reason Specified
                                         {% endif %}
                                     </td>
-                                    <td>
+                                    <td nowrap>
                                         {% if task.notes %}
                                         {{ task.notes }}
                                         {% else %}
                                         No Notes Specified
                                         {% endif %}
                                     </td>
-                                    <td>{{ task.date_created|date:"M d, Y" }}</td>
-                                    <td>{{ task.due_date|date:"M d, Y" }}</td>
-                                    <td>
+                                    <td nowrap>{{ task.date_created|date:"M d, Y" }}</td>
+                                    <td nowrap>{{ task.due_date|date:"M d, Y" }}</td>
+                                    <td nowrap>
                                         {% if task.given_date %}
                                         {{ task.given_date|date:"M d, Y" }}
                                         {% else %}

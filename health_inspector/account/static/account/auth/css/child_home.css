@@ -19,7 +19,7 @@ tr:not(:last-child){
     overflow-y: auto;
     margin: 0;
 }
-#child_table tr > th:nth-child(1), #child_table tr > td:nth-child(1),
+/*#child_table tr > th:nth-child(1), #child_table tr > td:nth-child(1),
 #child_table tr > th:nth-child(4), #child_table tr > td:nth-child(4){
     width: 120px !important;
     min-width: 120px !important;
@@ -36,7 +36,7 @@ tr:not(:last-child){
     width: 180px !important;
     min-width: 180px !important;
     max-width: 180px !important;
-}
+}*/
 [type="checkbox"]+label {
     padding-left: 20px;
 }
