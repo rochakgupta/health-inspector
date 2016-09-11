@@ -59,7 +59,6 @@ def login(request):
             auth_login(request, user)
             return redirect(reverse('home'))
 
-
 def signup_doctor(request):
     if request.user.is_authenticated():
         return redirect(reverse('home'))
@@ -82,7 +81,7 @@ def signup_doctor(request):
             doctor.doctor = custom_user
             doctor.save()
             return redirect(reverse('home'))
-        
+
 @login_required
 @require_http_methods(['GET', 'POST'])
 def signup_parent(request):
@@ -109,7 +108,7 @@ def signup_parent(request):
             parent.parent = custom_user
             parent.save()
             return redirect(reverse('home'))
-        
+
 @login_required
 @require_http_methods(['GET', 'POST'])
 def signup_child(request):
@@ -128,12 +127,10 @@ def signup_child(request):
             child.parent = f.valid_parent
             child.save()
             return redirect(reverse('home'))
-        
 
 def logout(request):
     auth_logout(request)
     return redirect(reverse('login'))
-
 
 @login_required
 @require_http_methods(['GET', 'POST'])
@@ -164,7 +161,7 @@ def edit_profile(request):
         if request.user.is_parent:
             p = ParentEditForm(request.POST, instance=Parent.objects.get(parent_id=request.user.id), prefix='p')
             p.is_valid()
-            p.errors.pop('aadhar')                
+            p.errors.pop('aadhar')
         else:
             if request.POST.get('parent_checkbox'):
                 p = ParentEditForm(request.POST, prefix='p')
@@ -181,7 +178,7 @@ def edit_profile(request):
                 context['parent_checkbox'] = 'Yes'
             else:
                 context['parent_checkbox'] = 'No'
-            if request.user.is_parent: 
+            if request.user.is_parent:
                 context['children'] = Child.objects.filter(parent_id=request.user.id)
             return render(request, 'account/auth/user_edit.html', context)
         else:
@@ -202,7 +199,7 @@ def edit_profile(request):
             custom_user.save()
             context = {}
             return redirect(reverse('edit-profile'))
-        
+
 @require_GET
 def search_child(request):
     query_term = request.GET.get('c')
@@ -233,7 +230,7 @@ def home_child(request, id=None):
         child_metadata = {}
         child_metadata['parent_name'] = child_obj.parent.parent.first_name + ' ' + child_obj.parent.parent.last_name
         child_metadata['parent_phone'] = child_obj.parent.parent.phone
-        child_metadata['parent_aadhar'] = child_obj.parent.aadhar 
+        child_metadata['parent_aadhar'] = child_obj.parent.aadhar
         child_metadata['gender'] = gender[child_obj.gender]
         tasks = [
             {
@@ -262,7 +259,7 @@ def home_child(request, id=None):
         return render(request, 'account/auth/child_home.html', {'child': child_obj, 'child_metadata': child_metadata, 'children': Child.objects.filter(parent_id=request.user.id), 'tasks': tasks, 'vaccines': vaccines})
     else:
         return redirect(reverse('home'))
-    
+
 @login_required
 @require_http_methods(['GET', 'POST'])
 def create_task(request, id=None):
@@ -296,7 +293,7 @@ def create_task(request, id=None):
                 return redirect(reverse('home-child', kwargs={'id': id}))
     else:
         return redirect(reverse('home-child', kwargs={'id': id}))
-    
+
 @login_required
 @require_http_methods(['GET', 'POST'])
 def edit_task(request, id=None, t_id=None):
@@ -316,79 +313,3 @@ def edit_task(request, id=None, t_id=None):
                 return redirect(reverse('home-child', kwargs={'id': id}))
     else:
         return redirect(reverse('home-child', kwargs={'id': id}))
-
-#from django.shortcuts import render, get_object_or_404, redirect
-#from django.http import Http404, JsonResponse, HttpResponse
-#from django.views.decorators.http import require_GET, require_POST, require_http_methods
-#from django.views.decorators.csrf import csrf_exempt
-#from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-#from django.core.urlresolvers import reverse
-#from django.core.mail import EmailMultiAlternatives
-#from django.conf import settings
-#from django.contrib.auth.decorators import login_required
-#from django.template import loader
-#from django.core.paginator import Paginator
-#from django.db.models import Q
-#from django.db.models import Count
-#from .models import CustomUser, Doctor, Parent, Child 
-#
-#@require_GET
-#@login_required
-#def home(request):
-#    if request.user.is_doctor:
-#        return redirect(reverse('home-doctor', kwargs={'id': request.user.id}))
-#    else:
-#        return redirect(reverse('home-parent', kwargs={'id': request.user.id}))
-#    
-#@require_GET
-#@login_required
-#def home_doctor(request, id=None):
-#    return render(request, 'account/auth/home_doctor.html', Doctor.get(doctor_id=id))
-#
-#@require_GET
-#@login_required
-#def home_parent(request, id=None):
-#    return render(request, 'account/auth/home_parent.html', Parent.get(parent_id=id))
-#
-#@require_http_methods(['GET', 'POST'])
-#def login(request):
-#    if request.user.is_authenticated():
-#        return redirect(reverse('home'))
-#    if request.method == 'GET' or (request.GET.get('type') != 'doctor' and request.GET.get('type') != 'parent'):
-#        context = {'f_doctor': DoctorLoginForm(), 'f_parent': ParentLoginForm()}
-#        return render(request, 'account/auth/login.html', context)
-#    else:
-#        if request.GET.get('type') == 'doctor':
-#            f_doctor = DoctorLoginForm(request.POST)
-#            if not f_doctor.is_valid():
-#                context = {'f_doctor': f_doctor, 'f_parent': ParentLoginForm()}
-#                return render(request, 'account/auth/login.html', context)
-#            user = f_doctor.authenticated_user
-#            auth_login(request, user)
-#            return redirect(reverse('home-doctor', kwargs={'id': user.id}))
-#        else:
-#            f_parent = ParentLoginForm(request.POST)
-#            if not f_parent.is_valid():
-#                context = {'f_doctor': DoctorLoginForm(), 'f_parent': f_parent}
-#                return render(request, 'account/auth/login.html', context)
-#            user = f_parent.authenticated_user
-#            auth_login(request, user)
-#            return redirect(reverse('home-parent', kwargs={'id': user.id}))
-#
-#
-#def signup_doctor(request):
-#    if request.user.is_authenticated():
-#        return redirect(reverse('home-doctor', kwargs={'id': request.user.id}))
-#    if request.method == 'GET':
-#        context = {'f': DoctorSignupForm()}
-#        return render(request, 'account/auth/doctor_signup.html', context)
-#    else:
-#        f = DoctorSignupForm(request.POST)
-#        if not f.is_valid():
-#            return render(request, 'account/auth/doctor_signup.html', {'f': f})
-#        else:
-#            user = f.save(commit=False)
-#            user.set_password(f.cleaned_data['password'])
-#            user.is_active = True
-#            user.save()
-#            return redirect(reverse('home-doctor', kwargs={'id': user.id}))
