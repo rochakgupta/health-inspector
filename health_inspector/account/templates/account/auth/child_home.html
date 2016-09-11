@@ -64,7 +64,19 @@
                                 {% for vaccine in vaccines %}
                                 <tr>
                                     <td>{{ vaccine.name }}</td>
-                                    <td>{{ vaccine.start|date:"M d, Y" }} - {{ vaccine.end|date:"M d, Y" }}</td>
+                                    <td>
+                                        <div class="row" style="margin:0;">
+                                            <div class="col s5">
+                                                {{ vaccine.start|date:"M d, Y" }}
+                                            </div>
+                                            <div class="col s2">
+                                                -----
+                                            </div>
+                                            <div class="col s5">
+                                                {{ vaccine.end|date:"M d, Y" }}
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>
                                         {% if vaccine.status %}
                                         <input type="checkbox" id="id_vaccination_{{ forloop.counter }}" checked>
